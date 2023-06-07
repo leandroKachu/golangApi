@@ -1,16 +1,17 @@
 package controllers
 
 import (
+	"api/src/auth"
 	"api/src/database"
 	"api/src/errorsResponse"
 	"api/src/model"
 	"api/src/repositories"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"reflect"
 	"strconv"
 	"strings"
 
@@ -100,10 +101,28 @@ func FindUserByID(w http.ResponseWriter, r *http.Request) {
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	bodyRequest, err := ioutil.ReadAll(r.Body)
+
+	if err != nil {
+		errorsResponse.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
 	vars := mux.Vars(r)
 	ID, _ := strconv.ParseUint(vars["userid"], 10, 64)
 
-	fmt.Println("var1 = ", reflect.TypeOf(bodyRequest))
+	ExtractIDfromToken, err := auth.ExtractIDfromToken(r)
+	if err != nil {
+		errorsResponse.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	fmt.Println(ID, ExtractIDfromToken, "token no controller")
+
+	if ID != ExtractIDfromToken && ExtractIDfromToken != ID {
+		errorsResponse.Error(w, http.StatusBadRequest, errors.New("user cannot update that user"))
+		return
+	}
+
 	fmt.Println(string(bodyRequest))
 
 	var user model.User

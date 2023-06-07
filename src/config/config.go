@@ -35,6 +35,7 @@ func Carregar() {
 	// 	"charset=utf8&parseTime=True&loc=Local",
 	// )
 
+	// catch the secret key from .env
 	SecretKey = []byte(os.Getenv("SECRET_KEY"))
 
 	fmt.Println(StringDeConexao)

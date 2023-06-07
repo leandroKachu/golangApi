@@ -45,12 +45,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 
 	}
-
+	// valid if the pass in body  is the same as the repository
 	if err := security.ValidPass(userPassHash.Password, user.Password); err != nil {
 		errorsResponse.Error(w, http.StatusUnauthorized, err)
 		fmt.Println("senha incorrect password")
 	}
 
+	//Create a token by id of user
 	token, _ := auth.GenToken(userPassHash.ID)
 	fmt.Println(token)
 
