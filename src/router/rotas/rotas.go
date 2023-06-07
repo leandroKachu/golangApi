@@ -21,7 +21,8 @@ func Configurar(r *mux.Router) *mux.Router {
 	for _, rota := range rotas {
 
 		if rota.RequerAutenticacao {
-			r.HandleFunc(rota.URI, middleware.Authenticator(middleware.Authenticator(rota.Funcao))).Methods(rota.Metodo)
+			// if true, add middleware validattion first logger to show in terminal and inside the autentication
+			r.HandleFunc(rota.URI, middleware.Logger(middleware.Authenticator(rota.Funcao))).Methods(rota.Metodo)
 		} else {
 			r.HandleFunc(rota.URI, middleware.Logger(rota.Funcao)).Methods(rota.Metodo)
 		}

@@ -22,18 +22,18 @@ var rotasUsuarios = []Rota{
 		URI:                "/findubyid/{userid}",
 		Metodo:             http.MethodGet,
 		Funcao:             controllers.FindUserByID,
-		RequerAutenticacao: false,
+		RequerAutenticacao: true,
 	},
 	{
 		URI:                "/update/{userid}",
 		Metodo:             http.MethodPut,
 		Funcao:             controllers.UpdateUser,
-		RequerAutenticacao: false,
+		RequerAutenticacao: true,
 	},
 	{
 		URI:                "/deleteuser/{userid}",
 		Metodo:             http.MethodDelete,
 		Funcao:             controllers.DeleteUser,
-		RequerAutenticacao: false,
+		RequerAutenticacao: true,
 	},
 }
