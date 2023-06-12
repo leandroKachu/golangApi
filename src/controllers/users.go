@@ -219,6 +219,42 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 	}
 
 	errorsResponse.JSON(w, http.StatusOK, "OK")
-	w.Write([]byte("Cadastrado com sucesso"))
+}
+
+func Unfollow(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	follow_user_id, err := strconv.ParseUint(vars["userid"], 10, 64)
+
+	if err != nil {
+		errorsResponse.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	current_userID, err := auth.ExtractIDfromToken(r)
+	if err != nil {
+		errorsResponse.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if follow_user_id == current_userID {
+		errorsResponse.Error(w, http.StatusBadRequest, errors.New("you cant unfollow yourself "))
+		return
+	}
+
+	db, err := database.Connection()
+	if err != nil {
+		errorsResponse.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	repository := repositories.NewRepositoryOfUsers(db)
+	response := repository.UnFollowUser(current_userID, follow_user_id)
+
+	if response != nil {
+		errorsResponse.Error(w, http.StatusBadRequest, err)
+		return
+	}
+
+	errorsResponse.JSON(w, http.StatusOK, "OK")
 
 }

@@ -126,3 +126,15 @@ func (repository *Users) FollowUser(current_userID, follow_userID uint64) error 
 	return nil
 
 }
+
+func (repository *Users) UnFollowUser(current_userID, follow_userID uint64) error {
+	query := "delete from followers where user_id = $1 and follower_id = $2"
+
+	result := repository.db.Exec(query, current_userID, follow_userID)
+	if result.Error != nil {
+		fmt.Println(result.Error)
+		return result.Error
+	}
+
+	return nil
+}
