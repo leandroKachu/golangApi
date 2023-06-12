@@ -111,3 +111,18 @@ func (repository *Users) CheckEmail(email string) (model.User, error) {
 	return user, nil
 
 }
+
+func (repository *Users) FollowUser(current_userID, follow_userID uint64) error {
+
+	query := "insert into followers (user_id, follower_id) values ($1, $2)"
+
+	result := repository.db.Exec(query, current_userID, follow_userID)
+
+	if result.Error != nil {
+		fmt.Println(result.Error)
+		return result.Error
+	}
+
+	return nil
+
+}
