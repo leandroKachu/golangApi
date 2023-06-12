@@ -152,3 +152,15 @@ func (repository *Users) FindFollowers(follower_userID uint64) ([]model.User, er
 	}
 	return user, nil
 }
+
+func (repository *Users) Following(userID uint64) ([]model.User, error) {
+	var user []model.User
+
+	result := repository.db.Table("users u").Select("u.id, u.name, u.nick, u.email, u.created_at").Joins("inner join followers s on u.id = s.user_id").Where("s.follower_id = ?", userID).Scan(&user)
+
+	fmt.Println(user)
+	fmt.Println(result)
+
+	return []model.User{}, nil
+
+}
