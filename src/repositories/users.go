@@ -138,3 +138,17 @@ func (repository *Users) UnFollowUser(current_userID, follow_userID uint64) erro
 
 	return nil
 }
+
+func (repository *Users) FindFollowers(follower_userID uint64) ([]model.User, error) {
+	var user []model.User
+	// essa queria de baixo existe um detalhe que impossibilitou de fazer a querie de forma desejada. usei left join e nao inner join
+	// result := repository.db.Table("users").Select("users.id, users.name, users.nick, users.email").Joins("left join followers on  users.id = followers.follower_id").Where("follower_id = ?", follower_userID).Scan(&user)
+	result := repository.db.Table("users u").Select("u.id, u.name, u.nick, u.email, u.created_at").Joins("inner join followers s on u.id = s.follower_id").Where("s.user_id = ?", follower_userID).Scan(&user)
+
+	fmt.Println(result)
+	fmt.Println(user)
+	if result.Error != nil {
+		return []model.User{}, result.Error
+	}
+	return user, nil
+}
