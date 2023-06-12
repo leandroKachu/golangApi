@@ -132,7 +132,6 @@ func (repository *Users) UnFollowUser(current_userID, follow_userID uint64) erro
 
 	result := repository.db.Exec(query, current_userID, follow_userID)
 	if result.Error != nil {
-		fmt.Println(result.Error)
 		return result.Error
 	}
 
@@ -145,8 +144,6 @@ func (repository *Users) FindFollowers(follower_userID uint64) ([]model.User, er
 	// result := repository.db.Table("users").Select("users.id, users.name, users.nick, users.email").Joins("left join followers on  users.id = followers.follower_id").Where("follower_id = ?", follower_userID).Scan(&user)
 	result := repository.db.Table("users u").Select("u.id, u.name, u.nick, u.email, u.created_at").Joins("inner join followers s on u.id = s.follower_id").Where("s.user_id = ?", follower_userID).Scan(&user)
 
-	fmt.Println(result)
-	fmt.Println(user)
 	if result.Error != nil {
 		return []model.User{}, result.Error
 	}
@@ -158,9 +155,9 @@ func (repository *Users) Following(userID uint64) ([]model.User, error) {
 
 	result := repository.db.Table("users u").Select("u.id, u.name, u.nick, u.email, u.created_at").Joins("inner join followers s on u.id = s.user_id").Where("s.follower_id = ?", userID).Scan(&user)
 
-	fmt.Println(user)
-	fmt.Println(result)
-
-	return []model.User{}, nil
+	if result.Error != nil {
+		return []model.User{}, result.Error
+	}
+	return user, nil
 
 }
