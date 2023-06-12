@@ -11,3 +11,13 @@ CREATE TABLE users (
     password varchar(100) not null unique,
     created_at timestamp default current_timestamp
 );
+
+
+
+CREATE TABLE followers (
+    user_id int not null,
+    follower_id int not null,
+    PRIMARY KEY (user_id, follower_id),
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (follower_id) REFERENCES users (id) ON DELETE CASCADE
+);
