@@ -72,10 +72,10 @@ func (repository *Users) FindUserByID(ID uint64) (model.User, error) {
 func (repository *Users) UpdateUser(user model.User, ID uint64) (model.User, error) {
 
 	query := "UPDATE users SET name = $1, nick = $2 WHERE id = $3"
-	result := repository.db.Exec(query, user.Name, user.Nick, ID)
+	result := repository.db.Exec(query, user.Name, user.Nick, ID).Find(&user)
 
 	if result.Error != nil {
-		log.Fatal(result)
+		log.Fatal(result.Error)
 	}
 	return model.User{Name: user.Name, Nick: user.Nick}, nil
 }
@@ -160,4 +160,30 @@ func (repository *Users) Following(userID uint64) ([]model.User, error) {
 	}
 	return user, nil
 
+}
+
+func (repository *Users) FindPassHash(userID uint64) (string, error) {
+	var user model.User
+	result := repository.db.Table("users").Select("password").Where("id = ?", userID).Find(&user)
+
+	if result.Error != nil {
+		return "", result.Error
+	}
+	return user.Password, nil
+}
+
+func (repository *Users) UpdatePass(pass string, userID uint64) (string, error) {
+	var user model.User
+
+	result := repository.db.Table("users").Where("id = ?", userID).Update("password", pass)
+	if result.Error != nil {
+		return user.Name, result.Error
+	}
+	selectuser := repository.db.Table("users").Select("name").Where("id = ?", userID).First(&user)
+
+	if selectuser.Error != nil {
+		return user.Name, result.Error
+	}
+
+	return user.Name, nil
 }

@@ -6,6 +6,7 @@ import (
 	"api/src/errorsResponse"
 	"api/src/model"
 	"api/src/repositories"
+	"api/src/security"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -309,4 +310,66 @@ func WhoFollowme(w http.ResponseWriter, r *http.Request) {
 	}
 
 	errorsResponse.JSON(w, http.StatusOK, followers)
+}
+
+func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	bodyRequest, _ := ioutil.ReadAll(r.Body)
+	userID, _ := strconv.ParseUint(vars["userid"], 10, 64)
+
+	current_userID, err := auth.ExtractIDfromToken(r)
+
+	if err != nil {
+		errorsResponse.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	var password model.Password
+
+	if err = json.Unmarshal(bodyRequest, &password); err != nil {
+		errorsResponse.Error(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if userID != current_userID {
+		errorsResponse.Error(w, http.StatusBadRequest, errors.New("you cant change other password from other account"))
+		return
+	}
+
+	db, err := database.Connection()
+	if err != nil {
+		errorsResponse.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	repository := repositories.NewRepositoryOfUsers(db)
+	passHash, err := repository.FindPassHash(userID)
+
+	if err != nil {
+		errorsResponse.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	err = security.ValidPass(passHash, password.CurrentPassword)
+
+	if err != nil {
+		errorsResponse.Error(w, http.StatusBadRequest, err)
+		return
+	}
+
+	newPass, err := security.Hash(password.NewPassword)
+
+	fmt.Println(err)
+
+	fmt.Println(newPass)
+	fmt.Println(string(newPass))
+
+	updated, err := repository.UpdatePass(string(newPass), userID)
+
+	if err != nil {
+		errorsResponse.Error(w, http.StatusBadRequest, err)
+		return
+	}
+	errorsResponse.JSON(w, http.StatusOK, updated)
 }
