@@ -36,4 +36,10 @@ var routesPost = []Rota{
 		Funcao:             controllers.DeletePost,
 		RequerAutenticacao: true,
 	},
+	{
+		URI:                "/posts/user/{userID}",
+		Metodo:             http.MethodGet,
+		Funcao:             controllers.GetPostByIDuser,
+		RequerAutenticacao: true,
+	},
 }

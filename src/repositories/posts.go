@@ -123,6 +123,42 @@ func (repository *Posts) DeletePost(postID uint64) (string, error) {
 
 }
 
+func (repository *Posts) GetPostByAuthorID(authorID uint64) ([]*model.Post, error) {
+	var posts []*model.Post
+	rows, err := repository.db.Table("posts p").
+		Select("DISTINCT p.*, u.nick").
+		Joins("INNER JOIN users u ON u.id = p.author_id").
+		Where("p.author_id = ?", authorID).
+		Rows()
+
+	if err != nil {
+		return []*model.Post{}, err
+	}
+
+	for rows.Next() {
+		post := &model.Post{}
+
+		err := rows.Scan(
+			&post.ID,
+			&post.Title,
+			&post.Content,
+			&post.AuthorID,
+			&post.Likes,
+			&post.Created_at,
+			&post.AuthorNick,
+		)
+		if err != nil {
+			return []*model.Post{}, err
+		}
+
+		posts = append(posts, post)
+	}
+
+	fmt.Println(posts)
+	return posts, nil
+
+}
+
 // query := "UPDATE users SET name = $1, nick = $2 WHERE id = $3"
 // result := repository.db.Exec(query, user.Name, user.Nick, ID).Find(&user)
 

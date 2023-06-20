@@ -8,6 +8,7 @@ import (
 	"api/src/repositories"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -180,4 +181,25 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	errorsResponse.JSON(w, http.StatusOK, result)
+}
+
+func GetPostByIDuser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	authorID, _ := strconv.ParseUint(vars["userID"], 10, 64)
+	db, err := database.Connection()
+	if err != nil {
+		errorsResponse.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+	repository := repositories.NewRepositoryOfPosts(db)
+
+	results, err := repository.GetPostByAuthorID(authorID)
+
+	fmt.Println(results)
+	if err != nil {
+		errorsResponse.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+	errorsResponse.JSON(w, http.StatusOK, results)
+
 }
