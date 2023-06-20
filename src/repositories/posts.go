@@ -159,6 +159,28 @@ func (repository *Posts) GetPostByAuthorID(authorID uint64) ([]*model.Post, erro
 
 }
 
+func (repository *Posts) LikePost(postID int64) (string, error) {
+	query := "UPDATE posts SET likes = likes + 1 WHERE id = $1"
+	result := repository.db.Exec(query, postID)
+
+	if result.Error != nil {
+		return "not possible update this post", result.Error
+	}
+
+	return "updated with sucess and liked", nil
+}
+
+func (repository *Posts) UnLike(postID int64) (string, error) {
+	query := "UPDATE posts SET likes = likes - 1 WHERE id = $1"
+	result := repository.db.Exec(query, postID)
+
+	if result.Error != nil {
+		return "not possible update this post", result.Error
+	}
+
+	return "updated with sucess and liked", nil
+}
+
 // query := "UPDATE users SET name = $1, nick = $2 WHERE id = $3"
 // result := repository.db.Exec(query, user.Name, user.Nick, ID).Find(&user)
 

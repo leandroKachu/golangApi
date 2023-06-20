@@ -42,4 +42,16 @@ var routesPost = []Rota{
 		Funcao:             controllers.GetPostByIDuser,
 		RequerAutenticacao: true,
 	},
+	{
+		URI:                "/post/{postID}/like",
+		Metodo:             http.MethodPost,
+		Funcao:             controllers.LikePost,
+		RequerAutenticacao: true,
+	},
+	{
+		URI:                "/post/{postID}/unlike",
+		Metodo:             http.MethodPost,
+		Funcao:             controllers.Unlike,
+		RequerAutenticacao: true,
+	},
 }

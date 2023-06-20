@@ -203,3 +203,39 @@ func GetPostByIDuser(w http.ResponseWriter, r *http.Request) {
 	errorsResponse.JSON(w, http.StatusOK, results)
 
 }
+
+func LikePost(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	postID, _ := strconv.ParseInt(vars["postID"], 10, 64)
+	db, err := database.Connection()
+	if err != nil {
+		errorsResponse.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+	repository := repositories.NewRepositoryOfPosts(db)
+
+	resultxt, err := repository.LikePost(postID)
+	if err != nil {
+		errorsResponse.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+	errorsResponse.JSON(w, http.StatusOK, resultxt)
+}
+
+func Unlike(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	postID, _ := strconv.ParseInt(vars["postID"], 10, 64)
+	db, err := database.Connection()
+	if err != nil {
+		errorsResponse.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+	repository := repositories.NewRepositoryOfPosts(db)
+
+	resultxt, err := repository.UnLike(postID)
+	if err != nil {
+		errorsResponse.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+	errorsResponse.JSON(w, http.StatusOK, resultxt)
+}
