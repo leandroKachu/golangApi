@@ -52,11 +52,17 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Create a token by id of user
-	token, _ := auth.GenToken(userPassHash.ID)
-	fmt.Println(token)
+	token, err := auth.GenToken(userPassHash.ID)
+	if err != nil {
+		errorsResponse.Error(w, http.StatusInternalServerError, err)
+		return
+	}
 
-	w.Write([]byte(token))
+	tokenAndId := map[string]interface{}{
+		"token": string(token),
+		"id":    userPassHash.ID,
+	}
 
-	// errorsResponse.JSON(w, http.StatusCreated, userID)
+	errorsResponse.JSON(w, http.StatusCreated, tokenAndId)
 
 }
