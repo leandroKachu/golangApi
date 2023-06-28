@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -58,11 +59,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokenAndId := map[string]interface{}{
-		"token": string(token),
-		"id":    userPassHash.ID,
-	}
+	userID := strconv.FormatInt(userPassHash.ID, 10)
 
-	errorsResponse.JSON(w, http.StatusCreated, tokenAndId)
+	errorsResponse.JSON(w, http.StatusOK, model.DataAuth{ID: userID, Token: token})
 
 }
